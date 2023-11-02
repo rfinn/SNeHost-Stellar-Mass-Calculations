@@ -11,6 +11,10 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   4. `conda install -c conda-forge jupyterlab`
     - If Jupyter Lab does not start, you may have to install `chardet`:
       - `conda install chardet`
+- You will also need to install `SWarp` via MacPorts onto *your device*.
+  - `SWarp` is used to co-add multiple `.fits` images using any astrometric projection.
+  - Go to [this link](https://www.macports.org/install.php) for the MacPorts installation guide. Once MacPorts is successfully installed onto your deivce, in a terminal, install `SWarp` with this line:
+    - `port install swarp`
 - Once all of these steps are complete, open the `TUTORIAL.ipynb` notebook and select the kernel that you just created.
 
 - Now you can start running the notebook by following the instructions layed out! 
