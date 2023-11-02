@@ -2,13 +2,24 @@
 Python pipeline for creating stellar mass calculations for galaxies observed in the infrared via the Wide-field Infrared Survey Explorer. Multiple outside repositories are referenced in the tutorial, plus instructions for cloning and working with the repositories are detailed in the tutorial.
 
 **Overview**:
-- Setup a conda environment and launch the `TUTORIAL.ipynb` notebook with the environment kernel.
-- Steup home directory, current working directory, subdirectories for data and plots, and append a path to the `halphagui` repository.
-- Read in your table of galaxy with the *at least* the following data columns:
-  - `'RA'`, `'DEC'`, `'AGCnr'`, `'mu'`, `'e_mu'`
-- Run the cells containing all of the functions
-- Call the `getMasses` function with your table, let it run, and voilà!
-  - The output table `galTable_withMasses.fits` automatically is downloaded into your `data` folder in your current working directory.
+- First, designate a folder/directory that you want to work out of, this directory will be where all of the files and images that are generated will go. This directory can be anywhere on your device, just make sure you can get the path for it (and remember where it is)!
+- Second, go to [this link](https://github.com/rfinn/halphagui) and clone the repository to your device. You will then need to go into that cloned repo and create a python virtual environment with Anaconda. Here is a [link](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#activating-an-environment) on how to create the virtual environment. One created, activate the environment.
+- Next, you will need to create a python environment kernel, install the `requirements.txt` for all of the dependencies of the `halphagui` repo, and install `jupyterlab` via these steps:
+  1. `pip install ipykernel`
+  2. `pip install -r requirements.txt`
+  3. `python -m ipykernel install --user --name=[insert name here]`
+  4. `conda install -c conda-forge jupyterlab`
+    - If Jupyter Lab does not start, you may have to install `chardet`:
+      - `conda install chardet`
+- Once all of these steps are complete, open the `TUTORIAL.ipynb` notebook and select the kernel that you just created.
+
+- Now you can start running the notebook by following the instructions layed out! 
+  - Setup the home directory, current working directory, subdirectories for data and plots, and append a path to the `halphagui` repository.
+  - Read in your table of galaxy with the *at least* the following data columns:
+    - `'RA'`, `'DEC'`, `'AGCnr'`, `'mu'`, `'e_mu'`
+  - Run the cells containing all of the functions
+  - Call the `getMasses` function with your table, let it run, and voilà!
+    - The output table `galTable_withMasses.fits` automatically is downloaded into your `data` folder in your current working directory.
 
 # TUTORIAL.ipynb
 - Main python notebook where the calculations are done. All of the code is set, just download a copy, and follow the directions & change the what is necessary!
