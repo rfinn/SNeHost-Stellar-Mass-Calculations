@@ -17,6 +17,7 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   - Setup the home directory, current working directory, subdirectories for data and plots, and append a path to the `halphagui` repository.
   - Read in your table of galaxy with the *at least* the following data columns:
     - `'RA'`, `'DEC'`, `'AGCnr'`, `'mu'`, `'e_mu'`
+    - Note: The table that I provided in this repo does not *have* to be the table that you run, so you can have your own table!
   - Run the cells containing all of the functions
   - Call the `getMasses` function with your table, let it run, and voilà!
     - The output table `galTable_withMasses.fits` automatically is downloaded into your `data` folder in your current working directory.
