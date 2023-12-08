@@ -1,4 +1,4 @@
-# GBT-Stellar-Mass-Calculations
+# WISE-Stellar-Mass-Calculations
 Python pipeline for creating stellar mass calculations for galaxies observed in the infrared via the Wide-field Infrared Survey Explorer. Multiple outside repositories are referenced in the tutorial, plus instructions for cloning and working with the repositories are detailed in the tutorial.
 
 **Overview**:
