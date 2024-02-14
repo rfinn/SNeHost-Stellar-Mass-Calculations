@@ -15,7 +15,7 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   - `SWarp` is used to co-add multiple `.fits` images using any astrometric projection.
   - Go to [this link](https://www.macports.org/install.php) for the MacPorts installation guide. Once MacPorts is successfully installed onto your deivce, in a terminal, install `SWarp` with this line:
     - `port install swarp`
-- Once all of these steps are complete, open the `TUTORIAL.ipynb` notebook and select the kernel that you just created.
+- Once all of these steps are complete, download and open the `TUTORIAL.ipynb` notebook and select the kernel that you just created.
 
 - Now you can start running the notebook by following the instructions layed out! 
   - Setup the home directory, current working directory, subdirectories for data and plots, and append a path to the `halphagui` repository.
