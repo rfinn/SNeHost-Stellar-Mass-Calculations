@@ -1,3 +1,43 @@
+import os
+import sys
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot as plt
+from astropy.table import Table,Column
+from astropy.io import fits
+from PIL import Image
+import warnings
+import glob
+warnings.filterwarnings('ignore')
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--cwd',dest='cwd',default=None,help='Set the current working directory for the tutorial.')
+parser.add_argument('--tablepath',dest='tablepath',default=None,help='Set the path to where your data table is located.')
+args = parser.parse_args()
+
+homedir = os.getenv('HOME')
+
+if args.cwd is not None:
+    cwd=args.cwd
+    os.chdir(cwd)
+
+if os.path.exists(cwd+'data/'):
+    print('Data Table (/data) subfolder already exists.\n')
+else:
+    print('Data Table (/data) subfolder does not exists, creating one now.\n')
+    os.mkdir(cwd+'data/')
+
+sys.path.append(homedir+'/github/halphagui/')
+
+import photwrapper
+from image_functions import *
+
+if args.tablepath is not None:
+    mytable=Table.read(args.tablepath)
+    print('Your Data Table was read in as `mytable`.\n')
+
 #################################################################################
 
 def getLW1(Fenc,mu,e_mu,m):
@@ -49,22 +89,18 @@ def getLW1(Fenc,mu,e_mu,m):
 
 #################################################################################
 
-def getPlots(ptab,galID):
+def getPlots(ptab,galID,image_names):
     '''
     Generates plots for the enclosed flux and source magnitude versus semi-major axis from the
-    photometry table via photwrapper. These plots are saved under the galPlots subfolder.
+    photometry table via photwrapper. These plots are saved under their own subfolder.
     
     Inputs:
         ptab = photwrapper output table for a given galaxy containing data for flux and magnitude for
                 for intervals of semi-major axis.
         galID = used only for the title of the plot, has both the AGC prefix and identification number
                  out to 6 digits.
+        image_names = list of the image file names for WISE W1-4.
     '''
-    
-    if os.path.exists(cwd+f'/galPlots/{galID}'):
-        pass
-    else:
-        os.mkdir(cwd+f'/galPlots/{galID}')
     
     SMA = ptab['sma_arcsec'] # semi-major axis measured in arcseconds
     FLUX = ptab['flux_erg'] # enclosed flux measured in ergs
@@ -84,17 +120,19 @@ def getPlots(ptab,galID):
     plt.xlabel("Semi-major axis (arcsec)",fontsize=14)
     plt.ylabel("Magnitude",fontsize=14)    
     
-    ptabimpath = cwd+f'galPlots/{galID}/'+f'{galID}-ptab-plots.png'
+    ptabimpath = args.cwd+f'{galID}/figures/'+f'{galID}-ptab-plots.png'
     if os.path.exists(ptabimpath):
         os.remove(ptabimpath)
     plt.savefig(ptabimpath)
+    plt.close()
 
     plt.figure(figsize=(12,6.5))
     # plot WISE images
-    imname = wiseImgs[0]
+    image_names.sort()
+    imname = image_names[0]
     imnames = ['W1','W2','W3','W4']
-    for i,im in enumerate(wiseImgs):
-        plt.subplot(2,4,4+i+1)
+    for i,im in enumerate(image_names):
+        plt.subplot(1,4,i+1)
         data = fits.getdata(im)
         display_image(data,percent=92)
         plt.title(imnames[i],fontsize=14)
@@ -103,18 +141,15 @@ def getPlots(ptab,galID):
     data = hdu[0].data
     hdu.close()
     
-    plt.figure()
-    plt.title(f'{galID} W1 cut')
-    display_image(data)
-    
-    W1impath = cwd+f'galPlots/{galID}/'+f'{galID}-W1cutout.png'
+    W1impath = args.cwd+f'{galID}/figures/'+f'{galID}-W1cutout.png'
     if os.path.exists(W1impath):
         os.remove(W1impath)
     plt.savefig(W1impath)
+    plt.close()
     
 #################################################################################
 
-def getPhot(imname):
+def getPhot(imname,galID,ngrow=1):
     '''
     Uses photwrapper, the halphagui repo photometry calculator for a detected galaxy through various 
     photutils methods/functions, to fit concentric ellipses on both the detected galaxy and the background sources.
@@ -123,23 +158,55 @@ def getPhot(imname):
     Inputs:
         imname = the selected image that you want to measure the flux of. For this these stellar mass calculations,
                      the W1.fits image for each galaxy will be used for the calculations, however you can input other files.
-                     Potential future project: running the r band image through the masker and using that mask for the
-                                               W1 image for a better mask.
+        galID = AGC prefix and identification number for target galaxy out to 6 digits.
+        ngrow = default value of 1 for WISE images, can be changed depending on what images you are analyzing.
+
+    Returns:
+        ptab = photwrapper output table for a given galaxy containing data for flux and magnitude for
+                for intervals of semi-major axis. 
+        e = photwrapper ellipse fitting/analysis for target galaxy.
     '''
+        
+    # check if mask exists
+    maskname = imname.replace('.fits','-mask.fits')
+    maskpath = args.cwd+f'{galID}/imdat/{maskname}'
     
-    e = photwrapper.ellipse(imname)
+    # looking for mask_wrapper file
+    if os.path.exists(maskpath):
+        maskfile = maskpath
+        print(f'\nMaskfile for {galID} found! No need to generate one.\n')
+
+        e = photwrapper.ellipse(imname,mask=maskpath)
+
+    else:
+        print(f'\nNo maskfile for {galID} found! Using maskwrapper.py to generate one now.\n')
+        
+        # call the mask wrapper from within your script
+        os.system(f"python ~/github/halphagui/maskwrapper.py --image {imname} --ngrow {ngrow} --sesnr {2} --minarea {5} --auto")
+        maskfile = maskpath
+    
+        e = photwrapper.ellipse(imname,mask=maskname)
     
     e.detect_objects()
-    e.find_central_object()
-    e.get_mask_from_segmentation()
-    e.get_ellipse_guess()
+    e.find_central_object()    
+    e.get_ellipse_guess()    
     e.measure_phot()     
     e.calc_sb()
     e.convert_units()
     e.write_phot_tables()
     e.write_phot_fits_tables()
     
-    ptabName = imname.replace('.fits','-phot.fits')
+    allApertures_filename = f'{galID}-allApertures.png'
+    e.show_seg_aperture(plotname=allApertures_filename)
+    plt.savefig(args.cwd+f'{galID}/figures/{allApertures_filename}')
+    plt.close()
+    
+    photApertures_filename = f'{galID}-photApertures.png'
+    e.draw_phot_apertures(plotname=photApertures_filename)
+    plt.savefig(args.cwd+f'{galID}/figures/{photApertures_filename}')
+    plt.close()
+    
+    ptabName = imname.replace('.fits','_phot.fits')
     ptab = Table.read(ptabName)
     
     return ptab,e
@@ -176,213 +243,79 @@ def getLogMass(LW1_array):
 
 #################################################################################
 
-def getMass(myGal,plotting=False,imsize=120,makeMask=True,changeSize=False,verbose=False):
-    '''
-    Reads in a table of galaxy coordinates to get wise/legacy images to calculate photometry; W1 phot will be converted
-    into a flux, then converted into a stellar mass.
-    
-    Inputs:
-        myGal = table entry of galactic coordinate data; needs 'RA', 'DEC', 'AGCnr', 'mu', and 'e_mu' columns
-        plotting = conditional to plot each photwrapper image step; default set to False
-        imsize = length/width of legacy/WISE image cutout; default set to 120; units: pixels
-        makeMask = conditional to mask off subtracted sky objects from segmentation image; default set to True
-        changeSize = conditional to search for previously made unwise images, deletes them, and remakes them with given imsize; 
-                        default set to False
-        verbose = conditional to have function talk to you through the processes within; be verbose!
-    
-    RETURNS:
-        ptab = table created from output photometry file via photwrapper
-        e = photwrapper ellipse data
-        galTable_withMasses = same as the table you read in, but with new columsn for calculated stellar masses and
-                                image size. This table updates every time you call the function!
-    '''
-    
-    # get sky coords and galaxy AGC ID from input table
-    ind = myGal.index
-    ra = myGal['RA']
-    dec = myGal['DEC']
-    galID = f"AGC{myGal['AGCnr']:06d}"; galNum = myGal['AGCnr']
-    
-    # setting pixel scaling
-    UNWISE_PIXSCALE = 2.75
-    LEGACY_PIXSCALE = 1
-    
-    if changeSize:
-        # checks to see if unwise images were created
-        dstring=f'{galID}-unwise*'
-        flist=glob.glob(dstring)
-        # removes image if it exists in the directory
-        for f in flist:
-            if os.path.exists(f):
-                os.remove(f)
-    
-    # gets the W1-4 and legacy images for the galaxy
-    legacyImgs, wiseImgs = display_legacy_unwise(ra,dec,galID,imsize_arcsec=imsize)
-    
-    # can be changed to different bands
-    imname = wiseImgs[0]
-    
-    %matplotlib inline
-    
-    if plotting:
-    
-        print()
-    
-        plt.figure(figsize=(12,6.5))
-
-        # concatinate lists
-        imnames = ['grz','g','r','z']
-        # plot legacy images in top row
-        for i,im in enumerate(legacyImgs):
-            plt.subplot(2,4,i+1)
-            if i == 0:
-                # display jpg
-                t = Image.open(im)
-                plt.imshow(t,origin='upper')
-            else:
-                data = fits.getdata(im)
-                display_image(data,lowrange=False,percent=95)
-            plt.title(imnames[i],fontsize=14)
-
-        # plot WISE images
-        imnames = ['W1','W2','W3','W4']
-        for i,im in enumerate(wiseImgs):
-            plt.subplot(2,4,4+i+1)
-            data = fits.getdata(im)
-            display_image(data,percent=92)
-            plt.title(imnames[i],fontsize=14)
-            
-        hdu = fits.open(imname)
-        data = hdu[0].data
-        hdu.close()
-    
-        plt.figure()
-        plt.title(f'{imname}')
-        display_image(data)
-    
-    ### PHOTWRAPPER ####
-        
-    ptab,e=getPhot(imname)
-        
-    if plotting:
-        
-        e.show_seg_aperture()
-        e.draw_guess_ellipse_mpl()
-        e.draw_phot_apertures()
-    
-    # Plot F_enc vs SMA and Mag vs SMA, then save the plot as .png in galPlots folder.
-    
-    getPlots(ptab,galID)
-    plt.show()
-
-    if verbose:
-        print(f"Max enclosed flux: {np.max(ptab['flux']):.2e}")
-        print(f"Max SMA: {np.max(ptab['sma_arcsec'])}"); print()
-
-    #################################
-    ### Stellar Mass Calculations ###
-    #################################
-    
-    maxFenc=np.max(ptab['flux_erg']) # max enclosed flux in ergs/cm^2 s
-    mu=myGal['mu'] # distance modulus
-    mu_err=myGal['e_mu'] # distance modulus error
-    mmag=np.min(ptab['mag']) # source magnitude via photutils
-
-    
-    LW1_mag,LW1_flux=getLW1(maxFenc,mu,mu_err,mmag)        
-
-    logMstar_mag=getLogMass(LW1_mag)
-    logMstar_flux=getLogMass(LW1_flux)
-
-    if verbose:
-        print(f"LW1_mag array: {LW1_mag}"); print()
-        print(f"LW1_flux array: {LW1_flux}"); print()
-        
-        print(f'Stellar masses based on magnitude: (upper, median, lower) \n{logMstar_mag}'); print()
-        print(f'Stellar masses based on flux: (upper, median, lower) \n{logMstar_flux}'); print()
-
-    if os.path.isfile(cwd+'data/galTable_withMasses.fits'):
-        if verbose:
-            print('Mass-updated table found! Reading in table...')
-        # reads in the masses table
-        galTable_withMasses = Table.read(cwd+'data/galTable_withMasses.fits')
-
-        # appends the calculated masses and image size to the respective rows
-        galTable_withMasses[ind]['logMstar_mag']=logMstar_mag.reshape((3,1))
-        galTable_withMasses[ind]['logMstar_flux']=logMstar_flux.reshape((3,1))
-        galTable_withMasses[ind]['Imsize']=int(imsize)
-        
-    else:
-        if verbose:
-            print('Mass-updated table not found, creating table...')
-        # creates a duplicate table
-        galTable_withMasses = Table.read(destinationPath)
-        
-        # creates columns for the stellar masses and image sizes
-        logMstar_mag_col = Column([np.zeros((3, 1), dtype=float)], name='logMstar_mag')
-        logMstar_flux_col = Column([np.zeros((3, 1), dtype=float)], name='logMstar_flux')
-        imsize_col = Column(int(0),name='Imsize')
-        
-        # adds those columns to the table
-        galTable_withMasses.add_column(logMstar_mag_col)
-        galTable_withMasses.add_column(logMstar_flux_col)
-        galTable_withMasses.add_column(imsize_col)
-        
-        # appends the calculated masses and image size to the respective rows
-        galTable_withMasses[ind]['logMstar_mag']=logMstar_mag.reshape((3,1))
-        galTable_withMasses[ind]['logMstar_flux']=logMstar_flux.reshape((3,1))
-        galTable_withMasses[ind]['Imsize']=int(imsize)
-
-    # this rewrites the galTable_withMasses.fits file in the data folder every time a new mass is calculated,
-    # which will keep track of all the masses that have been done without altering the primary fits file!
-    galTable_withMasses.write('data/galTable_withMasses.fits',format='fits',overwrite=True)
-    
-    return ptab,e,galTable_withMasses
-
-#################################################################################
-
 def getMasses(galTab,verbose=False):
     '''
     Reads in a table of galaxy coordinates to get wise/legacy images to calculate photometry; W1 phot will be converted
     into a flux, then converted into a stellar mass.
     
     Inputs:
-        galTab = table of galaxies to get stellar mass calculations, includes the columns:
-                    'AGRnr', 'RA', 'DEC', 'mu', 'e_mu', and 'Imsize'
+        galTab = table that has galaxies that need to have stellar masses calculated, was read in at the beginning of the notebook.
+                    Must have these columns: 'RA' , 'DEC' , 'AGCnr' , 'Imsize' , 'mu' , and 'e_mu' !!!
         verbose = conditional to have function talk to you through the processes within; be verbose!
     
     RETURNS:
-        galTable_withMasses = duplicated galTab, but with new columns 'logMstar_mag' and 'logMstar_flux' 
-                                for the respective calculated masses.
+        galTable_withMasses = duplicate table of galTab but includes new columns for the calculated stellar masses
+                                for magnitude and flux, plus their upper and lower calculations, too.
     '''
-        
+    
     for row in galTab:
         
         # get sky coords and galaxy AGC ID from input table
         ind = row.index
-        ra = row['RA']
-        dec = row['DEC']
-        galID = f"AGC{row['AGCnr']:06d}"; galNum = row['AGCnr']
-        imsize = row['Imsize']
-    
+        ra = float(row['RA'])
+        dec = float(row['DEC'])
+        galID = f"AGC{row['AGCrn']:06d}"; galNum = row['AGCnr']
+        imgsize = 120
+
+        # creates data folder for individual galaxy, then go into it
+        if not os.path.exists(args.cwd+galID):
+            os.mkdir(args.cwd+galID)
+
+        # looks to see if the image data subdirectories need to be made.
+        if not os.path.exists(args.cwd+f'{galID}/imdat/'):
+            os.mkdir(args.cwd+f'{galID}/imdat/')
+        
+        # looks to see if the plotting subdirectories need to be made.
+        if not os.path.exists(args.cwd+f'{galID}/figures/'):
+            os.mkdir(args.cwd+f'{galID}/figures/')
+        
         # setting pixel scaling
         UNWISE_PIXSCALE = 2.75
         LEGACY_PIXSCALE = 1
-        
-        # gets the W1-4 and legacy images for the galaxy
-        try:
-            legacyImgs, wiseImgs = display_legacy_unwise(ra,dec,galID,imsize_arcsec=imsize)
-        except:
-            continue
-    
-        # can be changed to different bands
-        imname = wiseImgs[0]
-    
-        ### PHOTWRAPPER ####
-        ptab,e=getPhot(imname)
 
-        # Plot F_enc vs SMA and Mag vs SMA, then save the plot as .png in galPlots folder.
-        getPlots(ptab,galID,wiseImgs)
+        ###########################
+        ### Getting WISE Images ###
+        ###########################
+        
+        try:
+            image_names,weight_names,multiframe = get_unwise_image(ra, dec, galid=galID,
+                                                    pixscale=UNWISE_PIXSCALE, imsize=imgsize, bands='1234',
+                                                    makeplots=False,subfolder=None,verbose=False)
+        except:
+            print(f'\nWarning: Problem with getting UNWISE images for {galID}!\n')
+            continue
+
+        # We need to sort the images because sometimes the images will be out of order in the array.
+        # This ensures that we always grab the W1 image for the calculations, but it can be changed if needed.
+
+        image_names.sort()
+        imname = image_names[0]
+
+        ##########################################
+        ### Maskwrapper & Photwrapper Analysis ###
+        ##########################################
+        
+        ptab,e=getPhot(imname,galID)
+
+        try:
+            ptab,e=getPhot(imname,galID,ngrow=1)
+        except:
+            print(f'\nWarning: Problem with photometry for {galID}!\n')
+            continue
+
+        # Plot F_enc vs SMA and Mag vs SMA, then save the plot as .png in the galaxy folder.
+        
+        getPlots(ptab,galID,image_names)
         
         #################################
         ### Stellar Mass Calculations ###
@@ -398,34 +331,40 @@ def getMasses(galTab,verbose=False):
         logMstar_mag=getLogMass(LW1_mag).round(5)
         logMstar_flux=getLogMass(LW1_flux).round(5)
 
-        if os.path.isfile(cwd+'data/galTable_withMasses.fits'):
-            # reads in the masses table
-            galTable_withMasses = Table.read(cwd+'data/galTable_withMasses.fits')
-
-            # appends the calculated masses and image size to the respective rows
-            galTable_withMasses['logMstar_mag'][ind]=logMstar_mag.reshape((3,1))
-            galTable_withMasses['logMstar_flux'][ind]=logMstar_flux.reshape((3,1))
+        massPath = args.cwd+'data/galTable_withMasses.fits'
         
+        if os.path.isfile(massPath):
+            # reads in the masses table
+            massTab = Table.read(massPath)
+            
         else:
             # creates a duplicate table
-            galTable_withMasses = Table.read(myGalTab_path)
-        
-            # creates columns for the stellar masses and image sizes
-            logMstar_mag_col = Column([np.zeros((3, 1), dtype=float)], name='logMstar_mag')
-            logMstar_flux_col = Column([np.zeros((3, 1), dtype=float)], name='logMstar_flux')
-        
-            # adds those columns to the table
-            galTable_withMasses.add_column(logMstar_mag_col)
-            galTable_withMasses.add_column(logMstar_flux_col)
+            massTab = Table.read(tablepath)          
+
+            # creates columns for stellar masses
+            flux_col_Median = Column(0.0, name='logMstar_flux_Median'); massTab.add_column(flux_col_Median)
+            flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
+            flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
             
-            # appends the calculated masses and image size to the respective rows
-            galTable_withMasses['logMstar_mag'][ind]=logMstar_mag.reshape((3,1))
-            galTable_withMasses['logMstar_flux'][ind]=logMstar_flux.reshape((3,1))
+        massTab['logMstar_flux_Median'][ind]=logMstar_flux[1]
+        massTab['logMstar_flux_Upper'][ind]=logMstar_flux[0]
+        massTab['logMstar_flux_Lower'][ind]=logMstar_flux[2]
 
         # this rewrites the galTable_withMasses.fits file in the data folder every time a new mass is calculated,
         # which will keep track of all the masses that have been done without altering the primary fits file!
-        galTable_withMasses.write('data/galTable_withMasses.fits',format='fits',overwrite=True)
-            
-    return galTable_withMasses
+        massTab.write(massPath,format='fits',overwrite=True)
 
-#################################################################################
+        # gathering all of the plots made and removing/renaming them to fall
+        # into respective galaxy image folder
+        galplots=glob.glob(galID+'*.png')
+        for img in galplots:
+            os.remove(img)
+        
+        imdata=glob.glob(galID+'-*')
+        for img in imdata:
+            if not os.path.exists(args.cwd+f'{galID}/imdat/{img}'):
+                os.rename(img,args.cwd+f'{galID}/imdat/{img}')
+            else:
+                os.remove(img)
+    
+    return massTab
