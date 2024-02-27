@@ -15,6 +15,7 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument('--cwd',dest='cwd',default=None,help='Set the current working directory for the tutorial.')
 parser.add_argument('--tablepath',dest='tablepath',default=None,help='Set the path to where your data table is located.')
+parser.add_argument('--overwrite',dest='overwrite',default=False,help='Overwrites check to see if mass has already been calculated, set to True if you need to recalculate the masses.')
 args = parser.parse_args()
 
 homedir = os.getenv('HOME')
@@ -257,7 +258,12 @@ def getMasses(galTab,verbose=False):
         galTable_withMasses = duplicate table of galTab but includes new columns for the calculated stellar masses
                                 for magnitude and flux, plus their upper and lower calculations, too.
     '''
-    
+
+    massPath = args.cwd+'data/galTable_withMasses.fits'
+    if os.path.isfile(massPath):
+        # reads in the masses table
+        massTab = Table.read(massPath)
+
     for row in galTab:
         
         # get sky coords and galaxy AGC ID from input table
@@ -266,6 +272,13 @@ def getMasses(galTab,verbose=False):
         dec = float(row['DEC'])
         galID = f"AGC{row['AGCnr']:06d}"; galNum = row['AGCnr']
         imgsize = 120
+
+        # checks to see if overwrite is set to True.
+        # if False: check to see if mass has been calculated and to continue to next galaxy if there is one.
+        if not args.overwrite:
+            if massTab['logMstar_flux_Median'][ind]>0.0:
+                print(f'\n{galID} mass already calculated, moving to next galaxy.\n')
+                continue
 
         # creates data folder for individual galaxy, then go into it
         if not os.path.exists(args.cwd+galID):
