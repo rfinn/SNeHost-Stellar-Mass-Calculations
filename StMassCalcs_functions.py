@@ -25,7 +25,7 @@ if args.cwd is not None:
     os.chdir(cwd)
 
 if os.path.exists(cwd+'data/'):
-    print('Data Table (/data) subfolder already exists.\n')
+    print('\nData Table (/data) subfolder already exists.\n')
 else:
     print('Data Table (/data) subfolder does not exists, creating one now.\n')
     os.mkdir(cwd+'data/')
@@ -263,6 +263,16 @@ def getMasses(galTab,verbose=False):
     if os.path.isfile(massPath):
         # reads in the masses table
         massTab = Table.read(massPath)
+        if verbose:
+            print('Table with calculated masses was found and read in.\n')
+    else:
+        # Create a duplicate table of input table.
+        massTab = Table.read(args.tablepath)          
+
+        # Create and add columns with 0.0 entries for the log stellar masses and their upper and lower bounds.
+        flux_col_Median = Column(0.0, name='logMstar_flux_Median'); massTab.add_column(flux_col_Median)
+        flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
+        flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
 
     for row in galTab:
         
@@ -275,22 +285,34 @@ def getMasses(galTab,verbose=False):
 
         # checks to see if overwrite is set to True.
         # if False: check to see if mass has been calculated and to continue to next galaxy if there is one.
+        
         if not args.overwrite:
             if massTab['logMstar_flux_Median'][ind]>0.0:
-                print(f'\n{galID} mass already calculated, moving to next galaxy.\n')
+                if verbose:
+                    print(f'{galID} mass already calculated, moving to next galaxy.')
                 continue
 
-        # creates data folder for individual galaxy, then go into it
+        print(f'\n------BEGIN CALCULATION: {galID}------\n')
+    
+        # Checks to see if galaxy subfolder exists, along with its own image data and figure subfolders.
         if not os.path.exists(args.cwd+galID):
             os.mkdir(args.cwd+galID)
-
-        # looks to see if the image data subdirectories need to be made.
-        if not os.path.exists(args.cwd+f'{galID}/imdat/'):
             os.mkdir(args.cwd+f'{galID}/imdat/')
-        
-        # looks to see if the plotting subdirectories need to be made.
-        if not os.path.exists(args.cwd+f'{galID}/figures/'):
             os.mkdir(args.cwd+f'{galID}/figures/')
+            if verbose:
+                print(f'Galaxy {galID} subfolders were not found, created them now.')
+        if verbose:
+            print(f'Galaxy {galID} subfolders already created.\n')
+
+        #if not os.path.exists(args.cwd+f'{galID}/imdat/'):
+            #os.mkdir(args.cwd+f'{galID}/imdat/')
+            #if verbose:
+                #print(f'Galaxy {galID} image data subfolder was not found, created it now.')
+        
+        #if not os.path.exists(args.cwd+f'{galID}/figures/'):
+            #os.mkdir(args.cwd+f'{galID}/figures/')
+            #if verbose:
+                #print(f'Galaxy {galID} figure subfolder was not found, created it now.')
         
         # setting pixel scaling
         UNWISE_PIXSCALE = 2.75
@@ -313,6 +335,8 @@ def getMasses(galTab,verbose=False):
 
         image_names.sort()
         imname = image_names[0]
+        if verbose:
+            print(f'\nunWISE images: {image_names}')
 
         ##########################################
         ### Maskwrapper & Photwrapper Analysis ###
@@ -339,29 +363,18 @@ def getMasses(galTab,verbose=False):
         mu_err=row['e_mu'] # distance modulus error
         mmag=np.min(ptab['mag']) # source magnitude via photutils
 
-        LW1_mag,LW1_flux=getLW1(maxFenc,mu,mu_err,mmag)        
+        LW1_mag,LW1_flux=getLW1(maxFenc,mu,mu_err,mmag)
 
         logMstar_mag=getLogMass(LW1_mag).round(5)
         logMstar_flux=getLogMass(LW1_flux).round(5)
-
-        massPath = args.cwd+'data/galTable_withMasses.fits'
-        
-        if os.path.isfile(massPath):
-            # reads in the masses table
-            massTab = Table.read(massPath)
-            
-        else:
-            # creates a duplicate table
-            massTab = Table.read(args.tablepath)          
-
-            # creates columns for stellar masses
-            flux_col_Median = Column(0.0, name='logMstar_flux_Median'); massTab.add_column(flux_col_Median)
-            flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
-            flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
+        if verbose:
+            print(f'\nLW1_mag = {LW1_mag}'+f'\nLW1_flux = {LW1_flux}\n')
             
         massTab['logMstar_flux_Median'][ind]=logMstar_flux[1]
         massTab['logMstar_flux_Upper'][ind]=logMstar_flux[0]
         massTab['logMstar_flux_Lower'][ind]=logMstar_flux[2]
+        if verbose:
+            print(f'logMstar_flux_Median = {logMstar_flux[1]}'+f'\nlogMstar_flux_Upper = {logMstar_flux[0]}'+f'\nlogMstar_flux_Lower = {logMstar_flux[2]}\n')
 
         # this rewrites the galTable_withMasses.fits file in the data folder every time a new mass is calculated,
         # which will keep track of all the masses that have been done without altering the primary fits file!
@@ -379,5 +392,10 @@ def getMasses(galTab,verbose=False):
                 os.rename(img,args.cwd+f'{galID}/imdat/{img}')
             else:
                 os.remove(img)
+        if verbose:
+            print(f'Removed {len(galplots)} plots for {galID}.\n'+f'Renamed/Removed {len(imdata)} data files for {galID}.\n')
+        print(f'------END CALCULATION: {galID}------\n')
+            
+    print('\nCalculations complete, view galTable_withMasses.fits for masses!')
     
     return massTab
