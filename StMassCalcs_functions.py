@@ -386,8 +386,8 @@ def getMasses(galTab,verbose=False):
             else:
                 os.remove(img)
         if verbose:
-            print(f'Removed {len(galplots)} plots for {galID}.\n'+f'Renamed/Removed {len(imdata)} data files for {galID}.\n')
-        print(f'------END CALCULATION: {galID}------\n')
+            print(f'Removed {len(galplots)} plots for {galID}.\n'+f'Renamed/Removed {len(imdata)} data files for {galID}.')
+        print(f'\n------END CALCULATION: {galID}------\n')
             
     print('\nCalculations complete, view galTable_withMasses.fits for masses!')
     
