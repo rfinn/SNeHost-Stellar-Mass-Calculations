@@ -13,9 +13,12 @@ warnings.filterwarnings('ignore')
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cwd',dest='cwd',default=None,help='Set the current working directory for the tutorial.')
-parser.add_argument('--tablepath',dest='tablepath',default=None,help='Set the path to where your data table is located.')
-parser.add_argument('--overwrite',dest='overwrite',default=False,help='Overwrites check to see if mass has already been calculated, set to True if you need to recalculate the masses.')
+parser.add_argument('--cwd',dest='cwd',default=None,
+        help='Set the current working directory for the tutorial.')
+parser.add_argument('--tablepath',dest='tablepath',default=None,
+        help='Set the path to where your data table is located.')
+parser.add_argument('--overwrite',dest='overwrite',default=False,
+        help='Overwrites check to see if mass has already been calculated, set to True if you need to recalculate the masses.')
 args = parser.parse_args()
 
 homedir = os.getenv('HOME')
@@ -389,3 +392,4 @@ def getMasses(galTab,verbose=False):
     print('\nCalculations complete, view galTable_withMasses.fits for masses!')
     
     return massTab
+    
