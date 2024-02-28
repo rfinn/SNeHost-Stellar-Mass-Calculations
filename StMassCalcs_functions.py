@@ -303,16 +303,6 @@ def getMasses(galTab,verbose=False):
                 print(f'Galaxy {galID} subfolders were not found, created them now.')
         if verbose:
             print(f'Galaxy {galID} subfolders already created.\n')
-
-        #if not os.path.exists(args.cwd+f'{galID}/imdat/'):
-            #os.mkdir(args.cwd+f'{galID}/imdat/')
-            #if verbose:
-                #print(f'Galaxy {galID} image data subfolder was not found, created it now.')
-        
-        #if not os.path.exists(args.cwd+f'{galID}/figures/'):
-            #os.mkdir(args.cwd+f'{galID}/figures/')
-            #if verbose:
-                #print(f'Galaxy {galID} figure subfolder was not found, created it now.')
         
         # setting pixel scaling
         UNWISE_PIXSCALE = 2.75
