@@ -1,0 +1,44 @@
+AGCnr_missing,Correct AGC nr,AGCnr_inSNeHostCat,sne_id,vhelio_missing,vhelio_inSNeHostCat,vhelio_sne,NED Coords of SNe,Comment,notes,Action
+3232,3232,3232,,,,,,"""Row 772 in SNeHostCat - not missing?""",this one is actually ok,none
+23036,,0,sn2009D,,0,,,"""Not sure why it is missing""","ned coords of sn: 03h54m22.8300s, -19d10m54.200s
+
+ESO 549- G 031; ESO 035211-1920.2; MCG -03-10-052; WISEA J035424.66-191124.9; 2MASX J03542465-1911250
+
+vr from NED: 7497 ± 10",confirm AGCnr from combined catalog and then update the SNe Host Galaxy Catalog
+27869,,0,sn2009aa,,0,,,"""Not sure why it is missing""","NED coords of sn: 11h23m42.2800s, -22d16m14.500s
+
+likely host galaxy is: 170.921661, -22.269646, vr=N/A ± N/A
+
+2MASS J11234119-2216107
+
+aka ESO 570- G 020 with vr=8187, (170.920667, -22.270500)",confirm AGCnr from combined catalog and then update the SNe Host Galaxy Catalog
+180952,180096,180096,sn2006te,,,,,"""Same galaxy - which AGCnr correct?""","seems like 180096 is the right match b/c it has an NGCIC of 0808+41, which is close to what is in ned for host galaxy",
+270462,270462,10754,sn2006mp,6985,10883,6789,,"""Wrong match in SNeHostCat""","AGC 270462 and 10754 are very close on the sky. However, AGC 270462 has the correct NGCIC listed that matched UGC 10754 in NED.",change AGCnr in UAT SNe Host Galaxy Catalog
+450525,,0,sn2006is,9393,0,9276,,"""Not sure why it is missing""","NED coords of sn: 79.393208, -23.781722, (05h17m34.3700s, -23d46m54.200s)
+
+host is: SN 2006is HOST; WISEA J051734.55-234659.7; GALEXASC J051734.53-234659.1; APMUKS(BJ) B051529.79-235009.8; MRSS 486-028833
+
+vr = 9426 ± 0",confirm AGCnr from combined catalog and then update the SNe Host Galaxy Catalog
+490781,,26756,sn2007al,3621,3650,3902,,"""Same galaxy - which AGCnr correct?""",NED name of host is WISEA J095918.72-192823.2; need full agc to check,
+540932,,30401,sn2008cf,13799,6564,13744,,"""Wrong match in SNeHostCat""","coords of sn: 14h07m32.5600s, -26d33m06.600s",need full AGC catalog to resolve this
+4133,4133,4134,sn2006qo,9130,8936,8865,,"""Confusion - close galaxy pair and haven't observed""","SN 2006qo HOST; UGC 04133; CGCG 287-025; CGCG 0756.1+5631; MCG +09-13-102; NED coords = 120.035625, 56.365611 which matches 4133 better than 4134",
+300486,300486,300487,sn2007ld,,,7479,"20h49m29.5900s, +00d00m14.000s","""Same galaxy - which AGCnr correct?""","search ned by position: 20h49m29.5900s, +00d00m14.000s
+
+closest galaxy is SDSS J204929.40+000016.8, (        312.372500, 0.004667),         6895 ± 1499
+
+AGC300486: (313.64624,56.498055) - def not close to target
+
+AGC300487: not in my agcnorthminus1.full200617.csv",don't see how this could be a source with DEC < -1 b/c that's over a degree away from SN and closest galaxy.  I would say the AGC nr in the SNe_full_sample is correct.
+490057,,0,sn2005,2514,0,2368,,"""Not sure why it is missing""",,add to SNe Host Galaxy Catalog
+500202,,0,sn2008bt,4551,0,4589,,"""Not sure why it is missing""","Likely host galaxy: NGC 3404
+NED coords of likely host: 162.574917, -12.108722
+NED vhelio: 4606 ± 6",add to SNe Host Galaxy Catalog
+550056,,550055,sn2005cf,1904,1957,1915,,"""Observing galaxy wrong match? 9 arcmin separation - GBT observation has contaminated profile.""",,
+11628,11628,11629,sn2002ha,4219,3500,3966,,"""Wrong match in SNeHostCat""","I think the host galaxy is NGC6962.  If so, the correct AGCnr is 11628",change AGCnr in UAT SNe Host Galaxy to 11628
+530277,,0,sn2007ca,4217,0,4202,,"""Not sure why it is missing""","NED coords of sn: 202.774208, -15.101833
+likely host coords: 202.774210, -15.101830
+likely host vhelio: 4236 ± 0",add to SNe Host Galaxy Catalog
+540121,,0,sn2009Y,2834,0,2792,,"""Not sure why it is missing""","NED coords of sn: 220.599375, -17.246778
+likely host: NGC 5728 
+likely host coords: 220.599570, -17.253081
+likely host vhelio: 2793 ± 8",add to SNe Host Galaxy Catalog
