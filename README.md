@@ -28,11 +28,25 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   - Call the `getMasses` function with your table, let it run, and voilà!
     - The output table `galTable_withMasses.fits` automatically is downloaded into your `data` folder in your current working directory.
 
-# UATGBT_dataTab.fits
-- This `.fits` file is the table that I used for the calculations, including the data for 191 galaxies in the GBT SNe host galaxies. This is the format that will be needed for your table! You can include other columns for further analysis, but refer to the **Overview** section for the minimum requirements.
+**Folders**:
+## dataTables 
+#### MissingAGC_fromSNeHostCatalog_20230425_GBTsample.csv
+  - Comma separated list of the 16 SNe host galaxies that had missing AGC numbers from the `UATSNeHostGalaxyCatalogue_20230425.csv`.
+  - We are working to verify which AGC numbers are the correct numbers based on their SN ID and position. Most of these galaxies have been verified, but there are a few that require the full AGC allsky catalog.
+#### SGA_matchedwith_GBT.fits
+  - words words words
+#### SNe_Hosts_Combined_Sample_20220922.csv
+  - words words words
+#### SNe_inUAT_withTypes.fits
+  - words words words
+#### UATSNeHostGalaxyCatalogue_20230425.csv
+  - words words words
 
-# galTable_withMasses.fits
-- This is the output table after calling the `getMasses` function. It is a duplicate of the input table (for this specific table, it is a duplicate of the `UATGBT_dataTab.fits`), but now it has new columns for the calculated stellar masses.
+## notebooks
+  - Nothing in here yet, but I will include sandbox notebooks that I have worked through that created the output stellar mass calculations for the GBT+Archival sample.
 
-# StMassCalcs-functions.py
-- (***WIP***) This will be a python file containing all of the functions needed to calculate the stellar masses.
+## outputs
+#### galTable_withMasses.fits
+
+## plots
+  - This folder is a work in progress. This folder will contain all of the photometric plots for each galaxy in my GBT+Archival sample, along with mass comparison plots with the Siena Galaxy Atlas and SDSS.
