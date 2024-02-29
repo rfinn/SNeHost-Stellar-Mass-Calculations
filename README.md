@@ -34,13 +34,14 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   - Comma separated list of the 16 SNe host galaxies that had missing AGC numbers from the `UATSNeHostGalaxyCatalogue_20230425.csv`.
   - We are working to verify which AGC numbers are the correct numbers based on their SN ID and position. Most of these galaxies have been verified, but there are a few that require the full AGC allsky catalog.
 #### SGA_matchedwith_GBT.fits
-  - words words words
+  - File containing 191 GBT+Archival galaxies that were matched with the Siena Galaxy Atlas. These are the galaxies that I will run bagpipes on to calculate logarithmic stellar masses from photometry.
 #### SNe_Hosts_Combined_Sample_20220922.csv
-  - words words words
+  - The original 334 SNe host galaxies from the GBT+Archival sample.
+  - Contains column names: AGCnr, HIMANGA, ALFALFA, SPRINGOB,	radeg,	decdeg,	hiflux,	width,	widtherr,	snr,	D,	vhelagc,	vhelio,	vopt,	v21,	Ty,	a,	b,	b/a,	zmag,	rms,	hisrc,	logMH,	logMH_Limit, and Type.
 #### SNe_inUAT_withTypes.fits
-  - words words words
+  - 
 #### UATSNeHostGalaxyCatalogue_20230425.csv
-  - words words words
+  - 
 
 ## notebooks
   - Nothing in here yet, but I will include sandbox notebooks that I have worked through that created the output stellar mass calculations for the GBT+Archival sample.
