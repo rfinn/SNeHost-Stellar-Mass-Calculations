@@ -1,7 +1,0 @@
-To Do:
-
-update masking routine to check for previously made masks
-update README
-remove tables that aren't needed; streamline it
-clean up tutorial
-update python file with functions for future integration
