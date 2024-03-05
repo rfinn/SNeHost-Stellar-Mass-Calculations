@@ -42,12 +42,9 @@ Python pipeline for creating stellar mass calculations for galaxies observed in 
   - 
 #### UATSNeHostGalaxyCatalogue_20230425.csv
   - 
-
+## galdata
+  - Will contain all of the data for each galaxy from the SNe host sample. Each galaxy will have a folder named with its AGC number, and subfolders `figures` containing images/cutouts for the unWISE images and photometry plots, and `imdat` contains all of the .fits and .csv files generated in `StMassCalcs_functions.py`.
 ## notebooks
   - Nothing in here yet, but I will include sandbox notebooks that I have worked through that created the output stellar mass calculations for the GBT+Archival sample.
-
 ## outputs
 #### galTable_withMasses.fits
-
-## plots
-  - This folder is a work in progress. This folder will contain all of the photometric plots for each galaxy in my GBT+Archival sample, along with mass comparison plots with the Siena Galaxy Atlas and SDSS.
