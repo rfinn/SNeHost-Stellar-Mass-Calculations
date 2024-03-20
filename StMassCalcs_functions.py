@@ -1,16 +1,22 @@
 import os
 import sys
+
+import warnings
+warnings.filterwarnings('ignore')
+
+import glob
+import argparse
+
 import numpy as np
+
 import matplotlib
+import matplotlib.pyplot as plt
 matplotlib.use('Agg')
-from matplotlib import pyplot as plt
+
 from astropy.table import Table,Column
 from astropy.io import fits
+
 from PIL import Image
-import warnings
-import glob
-warnings.filterwarnings('ignore')
-import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cwd',dest='cwd',default=None,
@@ -276,14 +282,18 @@ def getMasses(galTab,verbose=False):
         flux_col_Median = Column(0.0, name='logMstar_flux_Median'); massTab.add_column(flux_col_Median)
         flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
         flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
+        
+    RaCol=input('Enter RA column header:'); 
+    DecCol=input('Enter DEC column header:'); 
+    GalIDCol=input('Enter AGC number column header:'); print('\n') 
 
     for row in galTab:
         
         # get sky coords and galaxy AGC ID from input table
         ind = row.index
-        ra = float(row['RA'])
-        dec = float(row['DEC'])
-        galID = f"AGC{row['AGCnr']:06d}"; galNum = row['AGCnr']
+        ra = float(row[RaCol])
+        dec = float(row[DecCol])
+        galID = f"AGC{row[GalIDCol]:06d}"; galNum = row[GalIDCol]
         imgsize = 120
 
         # checks to see if overwrite is set to True.
