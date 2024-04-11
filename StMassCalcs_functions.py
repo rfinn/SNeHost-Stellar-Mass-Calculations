@@ -345,8 +345,6 @@ def getMasses(galTab,verbose=False):
         ### Maskwrapper & Photwrapper Analysis ###
         ##########################################
         
-        ptab,e=getPhot(imname,galID)
-
         try:
             ptab,e=getPhot(imname,galID,ngrow=1)
         except:
@@ -376,8 +374,11 @@ def getMasses(galTab,verbose=False):
         massTab['logMstar_flux_Median'][ind]=logMstar_flux[1]
         massTab['logMstar_flux_Upper'][ind]=logMstar_flux[0]
         massTab['logMstar_flux_Lower'][ind]=logMstar_flux[2]
+        
         if verbose:
-            print(f'logMstar_flux_Median = {logMstar_flux[1]}'+f'\nlogMstar_flux_Upper = {logMstar_flux[0]}'+f'\nlogMstar_flux_Lower = {logMstar_flux[2]}\n')
+            print(f'logMstar_flux_Median = {logMstar_flux[1]}')
+            print(f'\nlogMstar_flux_Upper = {logMstar_flux[0]}')
+            print(f'\nlogMstar_flux_Lower = {logMstar_flux[2]}')
 
         # this rewrites the galTable_withMasses.fits file in the data folder every time a new mass is calculated,
         # which will keep track of all the masses that have been done without altering the primary fits file!
