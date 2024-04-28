@@ -1,5 +1,4 @@
-import os
-import sys
+import os;import sys
 
 import warnings
 warnings.filterwarnings('ignore')
@@ -401,6 +400,7 @@ def getMasses(galTab,verbose=False):
         print(f'\n------END CALCULATION: {galID}------\n')
             
     print('\nCalculations complete, view galTable_withMasses.fits for masses!')
+    print('\nReading in galTable_withMasses.fits now...')
     
     return massTab
     
