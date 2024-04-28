@@ -253,7 +253,8 @@ def getMasses(galTab,verbose=False):
     into a flux, then converted into a stellar mass.
     
     Inputs:
-        galTab = table that has galaxies that need to have stellar masses calculated, was read in at the beginning of the notebook.
+        galTab = table that has galaxies that need to have stellar masses calculated, was read in at the beginning of the
+                    notebook.
                     Must have these columns: 'RA' , 'DEC' , 'AGCnr' , 'Imsize' , 'mu' , and 'e_mu' !!!
         verbose = conditional to have function talk to you through the processes within; be verbose!
     
