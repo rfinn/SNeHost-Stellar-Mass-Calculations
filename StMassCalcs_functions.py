@@ -1,20 +1,14 @@
 import os;import sys
-
 import warnings
 warnings.filterwarnings('ignore')
-
 import glob
 import argparse
-
 import numpy as np
-
 import matplotlib
 import matplotlib.pyplot as plt
 matplotlib.use('Agg')
-
 from astropy.table import Table,Column
 from astropy.io import fits
-
 from PIL import Image
 
 parser = argparse.ArgumentParser()
@@ -282,9 +276,12 @@ def getMasses(galTab,verbose=False):
         flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
         flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
         
-    RaCol=input('Enter RA column header:'); 
-    DecCol=input('Enter DEC column header:'); 
-    GalIDCol=input('Enter AGC number column header:'); print('\n') 
+    #RaCol=input('Enter RA column header:'); 
+    #DecCol=input('Enter DEC column header:'); 
+    #GalIDCol=input('Enter AGC number column header:'); print('\n') 
+    RaCol='RA'
+    DecCol='DEC'
+    GalIDCol='AGCnr'
 
     for row in galTab:
         
