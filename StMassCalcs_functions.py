@@ -278,12 +278,8 @@ def getMasses(galTab,verbose=False):
         flux_col_Upper = Column(0.0, name='logMstar_flux_Upper'); massTab.add_column(flux_col_Upper)
         flux_col_Lower = Column(0.0, name='logMstar_flux_Lower'); massTab.add_column(flux_col_Lower)
         
-    #RaCol=input('Enter RA column header:'); 
-    #DecCol=input('Enter DEC column header:'); 
-    #GalIDCol=input('Enter AGC number column header:'); print('\n') 
-    RaCol='RA'
-    DecCol='DEC'
-    GalIDCol='AGCnr'
+    #RaCol=input('Enter RA column header:');DecCol=input('Enter DEC column header:');GalIDCol=input('Enter AGC number column header:'); print('\n') 
+    RaCol='RA';DecCol='DEC';GalIDCol='AGCnr'
 
     for row in galTab:
         
@@ -399,7 +395,7 @@ def getMasses(galTab,verbose=False):
         print(f'\n------END CALCULATION: {galID}------\n')
             
     print('\nCalculations complete, view galTable_withMasses.fits for masses!')
-    print('\nReading in galTable_withMasses.fits now...')
+    print('\nReading in galTable_withMasses.fits now.')
     
     return massTab
     
